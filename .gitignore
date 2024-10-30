@@ -1,0 +1,32 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environment Configuration Files
+.env
+.venv
+env/
+venv/
+
+# Log files
+*.log
+
+# Database files
+*.sqlite3
+*.db
+
+# Temporary files
+*.tmp
+
+# Build Files
+build/
+dist/
+*.egg-info/
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# IDE Settings
+.vscode/
+.idea/
