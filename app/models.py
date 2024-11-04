@@ -1,24 +1,33 @@
+from sqlmodel import SQLModel, Field, Relationship
+from typing import List, Optional
+from datetime import time
 
-from typing import Optional
-from sqlmodel import Field, Relationship, SQLModel
 
 
-class Booking(SQLModel, table=True):
-    classroom_id: int | None = Field(default=None, foreign_key="classroom.id", primary_key=True)
-    user_id: int | None = Field(default=None, foreign_key="user.id", primary_key=True)
-    
+# Represents the Classroom table with fields for name, type, level, size, image URL, and related bookings.
 class Classroom(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
-    size: int
-    level: int
     type: str
-    booked: bool = Field(default=False)
-    users: list["User"] = Relationship(back_populates="classrooms", link_model=Booking)
-
+    level: int
+    size: int
+    image_url: Optional[str]  # URL of the classroom image
+    bookings: List["Booking"] = Relationship(back_populates="classroom")
+    
+# Represents the User table with fields for email, username, password, and related bookings.
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    username: str
     email: str
+    username: str
     password: str
-    classrooms: list[Classroom] = Relationship(back_populates="users", link_model=Booking)
+    bookings: List["Booking"] = Relationship(back_populates="user")
+
+# Represents the Booking table with fields for user, classroom, start time, end time, and relationships to User and Classroom.
+class Booking(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id")
+    classroom_id: int = Field(foreign_key="classroom.id")
+    start_time: time
+    end_time: time
+    user: "User" = Relationship(back_populates="bookings")
+    classroom: "Classroom" = Relationship(back_populates="bookings")

@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}Página de Inicio{% endblock %}
+{% block title %}Booking System{% endblock %}
 
 {% block content %}
 <div class="px-4 sm:px-6 lg:px-8 mt-20 bg-white">
@@ -32,7 +32,7 @@
                   </div>
                 </div>
                 <div class="mt-6">
-                  <a href="#" class="relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200">book<span class="sr-only">, {{item.name}}</span></a>
+                  <a href="/classrooms/{{item.id}}" class="relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200">book<span class="sr-only">, {{item.name}}</span></a>
                 </div>
               </li>
             {% endfor %}

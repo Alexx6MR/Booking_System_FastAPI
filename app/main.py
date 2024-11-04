@@ -1,22 +1,19 @@
+from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Annotated
-from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import select
 
-
-from models import Classroom
 from db.seed import seed
-from db.dbCondig import create_db_and_tables, SessionDep
+from db.dbConfig import create_db_and_tables
+from routes.auth import auth_router
+from routes.classroom import classroom_router
+from routes.user import user_router
 
 
-
-
-
+# Defines the lifespan of the application, creating database tables and seeding data during startup, and cleaning up resources during shutdown.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Load the ML model
@@ -25,12 +22,12 @@ async def lifespan(app: FastAPI):
     yield
     # Clean up the ML models and release the resources
  
-
+# Defines the app object and static folder.
 app = FastAPI(lifespan=lifespan)
 BASE_DIR = Path(__file__).resolve().parent
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
-templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
+# Adds CORS middleware to allow requests from any origin, with credentials, and all methods and headers.(NOT Important )
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -39,11 +36,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/", response_class=HTMLResponse)
-def root(request: Request, session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100,) -> list[Classroom]:
-    classrooms = session.exec(select(Classroom).offset(offset).limit(limit)).all()
-    if not classrooms:
-        raise HTTPException(status_code=404, detail="Classrooms not found")
+# Defines the root endpoint that redirects users to the /classrooms page.
+@app.get("/")
+def root()-> None:
+    return RedirectResponse(url="/classrooms")
 
-    return templates.TemplateResponse("index.html", {"request": request, "classroomsList": classrooms if len(classrooms) > 0 else []})
+# Includes the all the routers in the app.
+app.include_router(auth_router, prefix="/auth", tags=["auth"])
+app.include_router(classroom_router, prefix="/classrooms", tags=["classrooms"])
+app.include_router(user_router, prefix="/user", tags=["users"])
 
