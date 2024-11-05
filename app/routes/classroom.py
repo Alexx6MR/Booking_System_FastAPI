@@ -7,6 +7,7 @@ from fastapi.templating import Jinja2Templates
 from sqlmodel import select
 from models import Booking, Classroom
 from db.dbConfig import SessionDep
+from utils.converter import time_to_integer
 
 
 # Creates an API router for handling authentication-related endpoints.
@@ -23,12 +24,15 @@ def get_all_classrooms(request: Request, session: SessionDep, offset: int = 0, l
     classrooms = session.exec(select(Classroom).offset(offset).limit(limit)).all()
     accept_header = request.headers.get('accept')
     
+    # Acceder al contexto global
+    global_context = request.state.global_context
+    
     if not classrooms:
         raise HTTPException(status_code=404, detail="We dont have any classrooms in db")
     
     # # Checks if the request expects an HTML response.
     if 'text/html' in accept_header:
-        return templates.TemplateResponse("index.html", {"request": request, "classroomsList": classrooms if len(classrooms) > 0 else []})
+        return templates.TemplateResponse("pages/classrooms_page.html", {"request": request, "classroomsList": classrooms if len(classrooms) > 0 else [], "is_logged_in": global_context["is_logged_in"], "user_id":global_context["user_id"] })
     
     return JSONResponse(content=[classroom.model_dump() for classroom in classrooms])
 
@@ -39,6 +43,8 @@ def get_one_classroom(request: Request, classroom_id: int, session: SessionDep) 
     classroom = session.get(Classroom, classroom_id)
     # Retrieves the 'accept' header from the request to determine the desired response format.
     accept_header = request.headers.get('accept')
+     # Acceder al contexto global
+    global_context = request.state.global_context
     
     # Checks if the classroom object is None, indicating it was not found in the database.    
     if not classroom: 
@@ -82,7 +88,7 @@ def get_one_classroom(request: Request, classroom_id: int, session: SessionDep) 
     
     # this is for html
     if 'text/html' in accept_header:
-        return templates.TemplateResponse("booking_page.html", {"request": request, "classroom": classroom_data})
+        return templates.TemplateResponse("pages/booking_page.html", {"request": request, "classroom": classroom_data, "user_id": global_context["user_id"], "is_logged_in": global_context["is_logged_in"], "time_to_integer": time_to_integer})
     
     #This is for Curl or Swagger
     return JSONResponse(content=classroom_data)
