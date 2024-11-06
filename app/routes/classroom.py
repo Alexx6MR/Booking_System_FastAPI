@@ -32,7 +32,7 @@ def get_all_classrooms(request: Request, session: SessionDep, offset: int = 0, l
     
     # # Checks if the request expects an HTML response.
     if 'text/html' in accept_header:
-        return templates.TemplateResponse("pages/classrooms_page.html", {"request": request, "classroomsList": classrooms if len(classrooms) > 0 else [], "is_logged_in": global_context["is_logged_in"], "user_id":global_context["user_id"] })
+        return templates.TemplateResponse("pages/classroom/classroom_home_page.html", {"request": request, "classroomsList": classrooms if len(classrooms) > 0 else [], "is_logged_in": global_context["is_logged_in"], "user_id": global_context["user_id"]})
     
     return JSONResponse(content=[classroom.model_dump() for classroom in classrooms])
 
@@ -62,6 +62,8 @@ def get_one_classroom(request: Request, classroom_id: int, session: SessionDep) 
     # Get all bookings for the classroom
     bookings_statement = select(Booking).where(Booking.classroom_id == classroom_id)
     bookings = session.exec(bookings_statement).all()
+    user_id = global_context["user_id"]
+ 
 
     # Iterates through each hour between the start and end times to generate timeslots.
     while current_time < end_time:
@@ -71,11 +73,17 @@ def get_one_classroom(request: Request, classroom_id: int, session: SessionDep) 
         is_available = not any(
             booking.start_time <= current_time < booking.end_time for booking in bookings
         )
+        
+        is_user = not any(
+            booking.user_id == int(user_id) if isinstance(user_id, (int, float)) else user_id and is_available for booking in bookings
+        )
+        
         # Appends the current timeslot as a dictionary to the timeslots list, including start, end times, and availability.
         timeslots.append({
             "start_time": current_time.isoformat(),
             "end_time": next_time.isoformat(),
-            "available": is_available
+            "available": is_available,
+            "isFromUser": is_user
         })
         # Moves to the next hour for the next iteration of the timeslot generation.
         current_time = next_time
@@ -88,7 +96,7 @@ def get_one_classroom(request: Request, classroom_id: int, session: SessionDep) 
     
     # this is for html
     if 'text/html' in accept_header:
-        return templates.TemplateResponse("pages/booking_page.html", {"request": request, "classroom": classroom_data, "user_id": global_context["user_id"], "is_logged_in": global_context["is_logged_in"], "time_to_integer": time_to_integer})
+        return templates.TemplateResponse("pages/classroom/classroom_book_page.html", {"request": request, "classroom": classroom_data, "user_id": global_context["user_id"], "is_logged_in": global_context["is_logged_in"], "time_to_integer": time_to_integer})
     
     #This is for Curl or Swagger
     return JSONResponse(content=classroom_data)

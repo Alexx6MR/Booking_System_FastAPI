@@ -45,7 +45,7 @@ async def add_global_context(request: Request, call_next):
         "app_name": "Booking System",
         "year": 2024,
         "is_logged_in": request.cookies.get("session_token") is not None,  # Ejemplo: verificar si el usuario está autenticado
-        "user_id": request.cookies.get("user_id") is not None 
+        "user_id": request.cookies.get("user_id", None)
     }
     response = await call_next(request)
     return response
@@ -55,6 +55,11 @@ async def add_global_context(request: Request, call_next):
 @app.get("/")
 def root()-> None:
     return RedirectResponse(url="/classrooms")
+
+@app.get("/about")
+async def about(request: Request):
+    global_context = request.state.global_context
+    return templates.TemplateResponse("pages/about_page.html", {"request": request, "is_logged_in": global_context["is_logged_in"], "user_id": global_context["user_id"]})
 
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc):

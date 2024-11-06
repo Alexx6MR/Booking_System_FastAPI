@@ -17,7 +17,7 @@
     <div class="hidden lg:flex lg:gap-x-12">
       <a href="/classrooms" class="text-sm/6 font-semibold text-gray-900">Bookings</a>
       {% if is_logged_in %}
-      <a href="/{{user_id}}/mybookings" class="text-sm/6 font-semibold text-gray-900">My Bookings</a>
+      <a href="/user/{{user_id}}/bookings" class="text-sm/6 font-semibold text-gray-900">My Bookings</a>
       {% else %}
       <a href="#" class="text-sm/6 font-semibold text-gray-400">My Bookings</a>
       {% endif %}

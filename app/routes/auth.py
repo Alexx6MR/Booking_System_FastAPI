@@ -29,7 +29,7 @@ def hash_password(password: str) -> str:
 # Login route
 @auth_router.get("/login")
 def show_login(request: Request):
-    return templates.TemplateResponse("login_page.html", {"request": request,  
+    return templates.TemplateResponse("pages/auth/login_page.html", {"request": request,  
         "email_address": EMAIL_ADDRESS,
         "email_subject": EMAIL_SUBJECT,
         "email_body": EMAIL_BODY,
