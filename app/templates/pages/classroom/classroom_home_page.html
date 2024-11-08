@@ -14,7 +14,7 @@
           <div class="sm:flex sm:items-center">
             <div class="sm:flex-auto">
               <h1 class="text-base font-semibold text-gray-900">ClassRooms</h1>
-                <p class="mt-2 text-sm text-gray-700">A list of all the users in your account including their name, title, email and role.</p>
+                <p class="mt-2 text-sm text-gray-700">A list of all the classrooms, including their name, capacity, location, and availability.</p>
             </div>
       
           </div>
@@ -26,7 +26,7 @@
                   <li>
                     <div class="relative">
                       <div class="relative h-72 w-full overflow-hidden rounded-lg">
-                        <img src="https://tailwindui.com/plus/img/ecommerce-images/product-page-03-related-product-01.jpg" alt="Front of zip tote bag with white canvas, black canvas straps and handle, and black zipper pulls." class="h-full w-full object-cover object-center">
+                        <img src="{{item.image_url}}" alt="{{item.type}}" class="h-full w-full object-cover object-center">
                       </div>
                       <div class="relative mt-4">
                         <h3 class="text-sm font-medium text-gray-900">Name: {{item.name}}</h3>
@@ -38,7 +38,9 @@
                       </div>
                     </div>
                     <div class="mt-6 ">
-                      <a href="/classrooms/{{item.id}}" class="bg-indigo-200 relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-indigo-500">book<span class="sr-only">, {{item.name}}</span></a>
+                      <a href="/classrooms/{{item.id}}" class="mt-8 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        book<span class="sr-only">, {{item.name}}</span>
+                      </a>
                     </div>
                   </li>
                 {% endfor %}

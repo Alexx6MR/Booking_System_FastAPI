@@ -45,7 +45,7 @@ async def add_global_context(request: Request, call_next):
         "app_name": "Booking System",
         "year": 2024,
         "is_logged_in": request.cookies.get("session_token") is not None,  # Ejemplo: verificar si el usuario está autenticado
-        "user_id": request.cookies.get("user_id", None)
+        "user_id": request.cookies.get("user_id", 0)
     }
     response = await call_next(request)
     return response

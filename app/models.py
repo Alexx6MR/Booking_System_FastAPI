@@ -31,3 +31,7 @@ class Booking(SQLModel, table=True):
     end_time: time
     user: "User" = Relationship(back_populates="bookings")
     classroom: "Classroom" = Relationship(back_populates="bookings")
+
+class Timeslot(SQLModel):
+    start_time: time
+    end_time: time

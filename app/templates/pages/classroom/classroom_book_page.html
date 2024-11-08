@@ -51,7 +51,7 @@
         <h2 class="sr-only">Images</h2>
 
         <div>
-          <img src="https://tailwindui.com/plus/img/ecommerce-images/product-page-01-featured-product-shot.jpg" alt="Back of women&#039;s Basic Tee in black." class="rounded-lg lg:col-span-2 lg:row-span-2">
+          <img src="{{classroom.image_url}}" alt="{{classroom.type}}" class="rounded-lg lg:col-span-4 lg:row-span-4 w-full h-screen object-cover">
         </div>
       </div>
     <!--Sizes -->
@@ -65,30 +65,28 @@
 
           <!-- Size picker -->
           <div class="mt-8">
-            <div class="flex items-center justify-between">
-              <h2 class="text-sm font-medium text-gray-900">Size</h2>
-              <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">See sizing chart</a>
-            </div>
-
+            
             <fieldset aria-label="Choose a size" class="mt-2">
               <ul class="grid grid-cols-3 gap-3 sm:grid-cols-6">
 
                 {% for item in classroom.timeslots %}
               
-                {% if item.isFromUser %}
-                <li>
-                  <input type="checkbox" class="hidden peer">
-                  <label  class="inline-flex items-center justify-center w-full p-5 text-gray-800 bg-dark border-2 border-gray-300 rounded-lg cursor-pointer border-indigo-600 hover:text-gray-600 peer-checked:text-gray-800 hover:bg-gray-50">                           
-                    <span>{{time_to_integer(item.start_time)}}-{{time_to_integer(item.end_time)}}</span>
-                  </label>
-                </li>
-                {% elif item.available %}
+                {% if item.available and is_logged_in %}
                 <li>
                   <input type="checkbox" name="timeslot_ids" id="{{item}}" value="{{item}}" class="hidden peer">
                   <label for="{{item}}" class="inline-flex items-center justify-center w-full p-5 text-gray-800 bg-white border-2 border-gray-300 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600 peer-checked:text-gray-800 hover:bg-gray-50">                           
                     <span>{{time_to_integer(item.start_time)}}-{{time_to_integer(item.end_time)}}</span>
                   </label>
                 </li>
+                
+                {% elif item.isFromUser and is_logged_in%}
+                <li>
+                  <input type="checkbox" class="hidden peer">
+                  <label  class="inline-flex items-center justify-center w-full p-5 text-gray-400 bg-dark border-2 border-gray-300 rounded-lg border-indigo-600">                           
+                    <span>{{time_to_integer(item.start_time)}}-{{time_to_integer(item.end_time)}}</span>
+                  </label>
+                </li>
+               
                 {% else %}
                 <li>
                   <input type="checkbox" class="hidden peer">
@@ -101,10 +99,19 @@
               </ul>
             </fieldset>
           </div>
-
-          <button type="submit" class="mt-8 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-            Book it
-          </button>
+          
+          {% if is_logged_in %}
+            <button type="submit" class="mt-8 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+              Book it
+            </button>
+          
+      
+          {% else %}
+            <button disabled class="mt-8 flex w-full items-center cursor-default justify-center rounded-md border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white">
+              log in to Book it
+            </button>
+          {% endif %}
+          
         </form>
 
         <!-- Product details -->
@@ -112,20 +119,34 @@
           <h2 class="text-sm font-medium text-gray-900">Description</h2>
 
           <div class="prose prose-sm mt-4 text-gray-500">
-            <p>The Basic tee is an honest new take on a classic. The tee uses super soft, pre-shrunk cotton for true comfort and a dependable fit. They are hand cut and sewn locally, with a special dye technique that gives each tee it's own look.</p>
-            <p>Looking to stock your closet? The Basic tee also comes in a 3-pack or 5-pack at a bundle discount.</p>
+            <p>This spacious and modern classroom is perfect for lectures, workshops, and collaborative learning. Equipped with the latest audiovisual technology, including a high-definition projector, interactive whiteboard, and state-of-the-art sound system, it ensures a seamless teaching experience. Large windows provide ample natural light, creating a welcoming and conducive learning environment.</p>
+           
           </div>
         </div>
 
         <div class="mt-8 border-t border-gray-200 pt-8">
-          <h2 class="text-sm font-medium text-gray-900">Fabric &amp; Care</h2>
+          <h2 class="text-sm font-medium text-gray-900">Features:</h2>
 
           <div class="prose prose-sm mt-4 text-gray-500">
             <ul role="list">
-              <li>Only the best materials</li>
-              <li>Ethically and locally made</li>
-              <li>Pre-washed and pre-shrunk</li>
-              <li>Machine wash cold with similar colors</li>
+              <li>High-speed Wi-Fi</li>
+              <li>Climate control (air conditioning and heating)</li>
+              <li>Ergonomic chairs and adjustable tables</li>
+              <li>Whiteboard and markers</li>
+              <li>Built-in charging stations for laptops and other devices</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="mt-8 border-t border-gray-200 pt-8">
+          <h2 class="text-sm font-medium text-gray-900">Amenities:</h2>
+
+          <div class="prose prose-sm mt-4 text-gray-500">
+            <ul role="list">
+              <li>Accessible restrooms nearby</li>
+              <li>Water dispenser and coffee corner available in the hallway</li>
+              <li>Nearby parking for easy access</li>
+              <li>Vending machines with snacks and beverages</li>
             </ul>
           </div>
         </div>

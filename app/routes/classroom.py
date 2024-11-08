@@ -62,7 +62,7 @@ def get_one_classroom(request: Request, classroom_id: int, session: SessionDep) 
     # Get all bookings for the classroom
     bookings_statement = select(Booking).where(Booking.classroom_id == classroom_id)
     bookings = session.exec(bookings_statement).all()
-    user_id = global_context["user_id"]
+    user_id = global_context["user_id"] if global_context["user_id"] != None else 0
  
 
     # Iterates through each hour between the start and end times to generate timeslots.
@@ -74,8 +74,9 @@ def get_one_classroom(request: Request, classroom_id: int, session: SessionDep) 
             booking.start_time <= current_time < booking.end_time for booking in bookings
         )
         
-        is_user = not any(
-            booking.user_id == int(user_id) if isinstance(user_id, (int, float)) else user_id and is_available for booking in bookings
+        is_user = any(
+            booking.user_id == int(user_id) and booking.start_time <= current_time < booking.end_time
+            for booking in bookings
         )
         
         # Appends the current timeslot as a dictionary to the timeslots list, including start, end times, and availability.
@@ -83,7 +84,7 @@ def get_one_classroom(request: Request, classroom_id: int, session: SessionDep) 
             "start_time": current_time.isoformat(),
             "end_time": next_time.isoformat(),
             "available": is_available,
-            "isFromUser": is_user
+            "isFromUser": is_user,
         })
         # Moves to the next hour for the next iteration of the timeslot generation.
         current_time = next_time

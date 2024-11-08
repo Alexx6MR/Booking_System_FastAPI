@@ -51,12 +51,12 @@
         <h2 class="sr-only">Images</h2>
 
         <div>
-          <img src="https://tailwindui.com/plus/img/ecommerce-images/product-page-01-featured-product-shot.jpg" alt="Back of women&#039;s Basic Tee in black." class="rounded-lg lg:col-span-2 lg:row-span-2">
+          <img src="{{classroom.image_url}}" alt="{{classroom.type}}" class="rounded-lg lg:col-span-4 lg:row-span-4 w-full h-screen object-cover">
         </div>
       </div>
     <!--Sizes -->
       <div class="mt-8 lg:col-span-5">
-        <form action="/user/{{user_id}}/update/{{classroom_id}}" method="POST">
+        
           <!-- Input oculto para el Classroom ID -->
           <input type="hidden" name="classroom_id" value="{{ classroom.id }}">
           <input type="hidden" name="start_time" value="{{ start_time }}">
@@ -101,31 +101,44 @@
               </ul>
             </fieldset>
           </div>
-
-          <button type="submit" class="mt-8 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+          <button onclick="updateBooking('{{ user_id }}','{{ classroom_id }}')" class="mt-8 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
             Update it
           </button>
-        </form>
+      
 
         <!-- Product details -->
         <div class="mt-10">
           <h2 class="text-sm font-medium text-gray-900">Description</h2>
 
           <div class="prose prose-sm mt-4 text-gray-500">
-            <p>The Basic tee is an honest new take on a classic. The tee uses super soft, pre-shrunk cotton for true comfort and a dependable fit. They are hand cut and sewn locally, with a special dye technique that gives each tee it's own look.</p>
-            <p>Looking to stock your closet? The Basic tee also comes in a 3-pack or 5-pack at a bundle discount.</p>
+            <p>This spacious and modern classroom is perfect for lectures, workshops, and collaborative learning. Equipped with the latest audiovisual technology, including a high-definition projector, interactive whiteboard, and state-of-the-art sound system, it ensures a seamless teaching experience. Large windows provide ample natural light, creating a welcoming and conducive learning environment.</p>
+           
           </div>
         </div>
 
         <div class="mt-8 border-t border-gray-200 pt-8">
-          <h2 class="text-sm font-medium text-gray-900">Fabric &amp; Care</h2>
+          <h2 class="text-sm font-medium text-gray-900">Features:</h2>
 
           <div class="prose prose-sm mt-4 text-gray-500">
             <ul role="list">
-              <li>Only the best materials</li>
-              <li>Ethically and locally made</li>
-              <li>Pre-washed and pre-shrunk</li>
-              <li>Machine wash cold with similar colors</li>
+              <li>High-speed Wi-Fi</li>
+              <li>Climate control (air conditioning and heating)</li>
+              <li>Ergonomic chairs and adjustable tables</li>
+              <li>Whiteboard and markers</li>
+              <li>Built-in charging stations for laptops and other devices</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="mt-8 border-t border-gray-200 pt-8">
+          <h2 class="text-sm font-medium text-gray-900">Amenities:</h2>
+
+          <div class="prose prose-sm mt-4 text-gray-500">
+            <ul role="list">
+              <li>Accessible restrooms nearby</li>
+              <li>Water dispenser and coffee corner available in the hallway</li>
+              <li>Nearby parking for easy access</li>
+              <li>Vending machines with snacks and beverages</li>
             </ul>
           </div>
         </div>
@@ -133,4 +146,69 @@
         
       </div>
   </main>
+
+  <script>
+    function fixAndParseJSON(str) {
+      try {
+          // Reemplaza comillas simples con comillas dobles y convierte True/False a true/false
+          const fixedStr = str
+              .replace(/'/g, '"')  // Reemplaza comillas simples con comillas dobles
+              .replace(/True/g, 'true')  // Reemplaza True con true
+              .replace(/False/g, 'false');  // Reemplaza False con false
+          
+          // Intenta parsear la cadena corregida
+          return JSON.parse(fixedStr);
+      } catch (error) {
+          console.error("Error parsing JSON:", error, "with string:", str);
+          return null; // Devuelve null si hay un error en el parseo
+      }
+  }
+
+    function updateBooking(user_id, classroom_id) {  
+      if (confirm('Are you sure you want to update this reservation?')) {
+          // Obtener todos los checkboxes seleccionados
+          const selectedTimeslots = Array.from(document.querySelectorAll('input[name="timeslot_ids"]:checked'))
+              .map(input => fixAndParseJSON(input.value));
+  
+          console.log("Selected timeslots:", selectedTimeslots);
+  
+          // Verificar si se han seleccionado timeslots
+          if (selectedTimeslots.length === 0) {
+              alert('Please select at least one timeslot.');
+              console.warn("No timeslots selected.");
+              return;
+          }
+    
+          // Enviar la solicitud con los timeslots seleccionados
+          fetch(`/user/${user_id}/update/${classroom_id}`, {
+              method: 'PUT',  // Asegúrate de que tu backend soporte este método
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(
+               selectedTimeslots
+              ),
+          })
+          .then(response => {
+              console.log("Fetch response status:", response.status);
+  
+              if (response.ok) {
+                  alert('Reservation updated successfully.');
+                  window.location.reload();
+              } else {
+                  return response.text().then(text => {
+                      console.error("Error response text:", text);
+                      alert(`Error updating reservation: ${text}`);
+                  });
+              }
+          })
+          .catch(error => {
+              console.error('Fetch request failed:', error);
+              alert('Network or request error occurred.');
+          });
+      }
+  }
+   
+  </script>
+
 {% endblock %}

@@ -1,6 +1,6 @@
 from datetime import datetime
 import re
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 
 
 
@@ -33,4 +33,24 @@ def is_valid_email(email: str) -> bool:
     pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     return re.match(pattern, email) is not None
 
+def authorized_user(request: Request, user_id:int):
+    global_context = request.state.global_context
+    is_logged_in = global_context["is_logged_in"]
+    logged_user = global_context["user_id"] 
+        
+    
+    if not is_logged_in:
+        raise HTTPException(
+            status_code=401,
+            detail="User not authenticated",
+        )
 
+    elif int(logged_user) != int(user_id):
+        raise HTTPException(
+            status_code=401,
+            detail="User not authenticated",
+        )
+    
+    
+    
+    return [is_logged_in, logged_user]
